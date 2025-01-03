@@ -134,7 +134,7 @@
         const currentTime = Math.floor(Date.now() / 1000); // Timestamp corrente in secondi
         console.log(currentTime);
         console.log(decoded.payload.exp);
-        if (decoded.payload.exp > currentTime){
+        if (decoded.payload.exp < currentTime){
             window.location.href = '/login.html'; // Redireziona al login
             sessionStorage.removeItem('jwt_token');
         }
