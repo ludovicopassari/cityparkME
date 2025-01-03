@@ -1,0 +1,50 @@
+{
+    "action": "login_request",
+    "data": {
+      "email": "user@example.com",
+      "password": "your_password_here"
+    }
+}
+
+  
+{
+  "status": "pending",
+  "message": "OTP sent successfully",
+  "otp_channel": "sms",
+  "transaction_id": "abc123xyz" 
+}
+
+{
+    "action": "verify_otp",
+    "data": {
+      "transaction_id": "abc123xyz",
+      "otp": "123456"
+    }
+}
+
+{
+    "status": "success",
+    "message": "Authentication successful",
+    "auth_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+
+{
+    "status": "error",
+    "message": "Invalid or expired OTP",
+    "retry_allowed": true,
+    "remaining_attempts": 2
+}
+
+{
+    "status": "error",
+    "message": "Invalid username or password",
+    "retry_allowed": true,
+    "remaining_attempts": 4
+}
+
+{
+    "status": "error",
+    "message": "Account temporarily locked due to multiple failed attempts. Please try again in 15 minutes.",
+    "retry_allowed": false
+}
+  

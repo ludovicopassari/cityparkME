@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Smart Parking</title>
+    <!-- Link per Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Stili personalizzati */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .tab-content {
+            margin-top: 20px;
+        }
+        .dashboard-info {
+            margin-top: 20px;
+        }
+        .info-box {
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .info-box h4 {
+            margin-bottom: 15px;
+        }
+        .info-box p {
+            font-size: 16px;
+        }
+        .map-container {
+            height: 300px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+        }
+    </style>
+
+
+</head>
+<body>
+    <!-- Barra di navigazione superiore con il tab -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">MeCityPark</a>
+        <ul class="nav ml-auto">
+            <!-- Tab con il menu a discesa -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Menu
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="#">Impostazioni</a>
+                    <a class="dropdown-item" href="#">Profilo</a>
+                    <a class="dropdown-item" href="#">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Contenuto principale della dashboard -->
+    <div class="container mt-5">
+        <!-- Sezione delle informazioni generali sul servizio di smart parking -->
+        <div class="row dashboard-info">
+            <div class="col-md-6">
+                <div class="info-box">
+                    <h4>Parcheggi Disponibili</h4>
+                    <p>Attualmente sono disponibili <strong>120 posti auto</strong> per il parcheggio in città.</p>
+                </div>
+                <div class="info-box">
+                    <h4>Parcheggi Occupati</h4>
+                    <p>Il <strong>70%</strong> dei parcheggi è attualmente occupato, con una media di <strong>15 minuti</strong> di attesa per il prossimo posto disponibile.</p>
+                </div>
+                <div class="info-box">
+                    <h4>Statistica di Utilizzo</h4>
+                    <p>Il servizio di smart parking ha visto un aumento del <strong>25%</strong> nell'uso dei parcheggi nelle ultime settimane.</p>
+                </div>
+            </div>
+
+            <!-- Mappa del parcheggio (simulazione) -->
+            <div class="col-md-6">
+                <div class="info-box">
+                    <h4 id="test">Visualizza la Mappa dei Parcheggi</h4>
+                    <div class="map-container">
+                        <!-- Qui puoi inserire una mappa interattiva, ad esempio con Google Maps -->
+                        <p class="text-center pt-5">Mappa interattiva del parcheggio (in futuro sarà aggiunta una mappa reale)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab con le informazioni aggiuntive -->
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="overview">
+                <h4>Panoramica del Servizio</h4>
+                <p>Il nostro servizio di Smart Parking utilizza tecnologie avanzate per monitorare la disponibilità dei parcheggi in tempo reale, ottimizzando il flusso del traffico e riducendo le congestioni nelle aree urbane.</p>
+            </div>
+            <div class="tab-pane fade" id="details">
+                <h4>Dettagli Tecnici</h4>
+                <p>I parcheggi sono monitorati tramite sensori IoT, che comunicano direttamente con l'app mobile per fornire informazioni precise sulla disponibilità.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script per Bootstrap JS e dipendenze -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function decodeJWT(token) {
+            const parts = token.split('.');
+            
+            if (parts.length !== 3) {
+                throw new Error('Token JWT non valido');
+            }
+
+            // Decodifica l'header e il payload (Base64 URL-safe)
+            const header = JSON.parse(atob(parts[0]));
+            const payload = JSON.parse(atob(parts[1]));
+
+            return { header, payload };
+            }
+
+        // Recupero del token JWT
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+            console.log("Token non trovato. Redireziona al login.");
+            window.location.href = '/login.html'; // Redireziona al login
+            
+        }
+
+        const decoded = decodeJWT(token);
+        const currentTime = Math.floor(Date.now() / 1000); // Timestamp corrente in secondi
+        console.log(currentTime);
+        console.log(decoded.payload.exp);
+        if (decoded.payload.exp > currentTime){
+            window.location.href = '/login.html'; // Redireziona al login
+            sessionStorage.removeItem('jwt_token');
+        }
+
+        document.getElementById('test').textContent = 'User ID : ' + String(decoded.payload.user_id);
+        console.log(decoded);
+    </script>
+</body>
+</html>

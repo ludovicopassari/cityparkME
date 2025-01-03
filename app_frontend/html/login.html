@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Link per Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center" style="height: 100vh; align-items: center;">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title text-center">Login</h4>
+                    </div>
+                    <form id="loginForm" method="POST">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Inserisci la tua email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Inserisci la tua password" required>
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="rememberMe">
+                                <label class="form-check-label" for="rememberMe">Ricordami</label>
+                            </div>
+                            <button id ="submitBtn" class="btn btn-primary btn-block">Accedi</button>
+                        </div>
+                    </form>
+                       
+                    <div class="card-footer text-center">
+                        <small>Non hai un account? <a href="registration.html">Registrati</a></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script per Bootstrap JS e dipendenze -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+     <!-- Script di validazione del modulo -->
+    <script>
+
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+        
+            event.preventDefault(); // Prevenire l'invio del form tradizionale
+        
+            const formData = new FormData(this);
+
+            const email = formData.get('email')
+            const password = formData.get('password')
+            
+            const requestData = {
+                action: "login_request",
+                data: {
+                    email: email,
+                    password: password
+                }
+            };
+
+            const jsonRequest = JSON.stringify(requestData);
+            
+            fetch('http://localhost:5001/authenticate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json' // Imposta il tipo di contenuto
+                        },
+                        body: JSON.stringify(requestData)
+                    }
+                ).then(response => {
+                    if (!response.ok) {
+                        return Promise.reject('Errore nella richiesta HTTP');
+                    }
+                    
+                    return response.json();
+                }).then(data => {
+                    
+                    const transactionID = data.transaction_id;
+                    // Costruzione dell'URL con i parametri GET
+                    const url = `otp.html?transactionID=${encodeURIComponent(transactionID)}`;
+                    window.location.href = url;
+                    console.log(data);
+
+                }).catch(error => {
+                    console.error('Errore:', error);
+                });
+            
+        });
+    </script>
+
+</body>
+</html>
+
+

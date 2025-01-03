@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica OTP</title>
+    <!-- Link per Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center" style="height: 100vh; align-items: center;">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title text-center">Verifica OTP</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-center">Inserisci il codice OTP che ti è stato inviato via email.</p>
+                        <form id="otpForm">
+                            <div class="form-group">
+                                <label for="otp">OTP</label>
+                                <input type="text" class="form-control" id="otp" name="otp" placeholder="Inserisci il tuo codice OTP" required maxlength="6">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Verifica OTP</button>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center">
+                        <small>Non hai ricevuto il codice? <a href="#">Rinvia OTP</a></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script per Bootstrap JS e dipendenze -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
+    <script>
+        // Ottieni i parametri GET dall'URL
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Estrai i valori dei parametri
+        const transactionID = urlParams.get('transactionID');
+        
+        document.getElementById('otpForm').addEventListener('submit', function(event) {
+        
+        event.preventDefault(); // Prevenire l'invio del form tradizionale
+    
+        const formData = new FormData(this);
+
+        const otp = formData.get('otp')
+        
+        const requestData = {
+            "action": "verify_otp",
+            "data": {
+            "transaction_id": transactionID,
+            "otp": otp
+            }
+        };
+
+        const jsonRequest = JSON.stringify(requestData);
+        
+        fetch('http://localhost:5001/authenticate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Imposta il tipo di contenuto
+                    },
+                    body: JSON.stringify(requestData)
+                }
+            ).then(response => {
+                if (!response.ok) {
+                    return Promise.reject('Errore nella richiesta HTTP');
+                }
+                
+                return response.json();
+            }).then(data => {
+                
+                if(data.status === 'success'){
+                    localStorage.setItem('jwt_token', data.auth_token);
+                }
+
+                // Costruzione dell'URL con i parametri GET
+                const url = `dashboard.html?`;
+
+                // Redirezione
+                window.location.href = url;
+                
+            }).catch(error => {
+                console.error('Errore:', error);
+            });
+        
+    });
+    </script>
+</script>
