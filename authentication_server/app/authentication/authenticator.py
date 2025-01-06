@@ -188,7 +188,7 @@ def check_second_factor(otp_prop,id_transaction):
                       # Creazione del payload
                     payload = {
                         "user_id": user_id,
-                        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Scadenza: 1 ora
+                        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=0.0333)  
                     }
 
                     # Generazione del token
