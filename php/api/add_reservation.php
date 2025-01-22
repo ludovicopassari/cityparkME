@@ -123,6 +123,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Esegui la query
                 $stmt_insert->execute();
+
+                //modifica lo stato di occupazione del parcheggio
+                $sql_status_update =  "UPDATE `parking_slots` SET is_occupied= 1 WHERE slot_id = :slot_id";
+                $stmt_status_update = $pdo->prepare($sql_status_update);
+                $stmt_status_update->bindParam(':slot_id',$slot_id);
+                $stmt_status_update->execute();
+
                 // Restituisci una risposta di successo
                 echo json_encode(['success' => true, 'message' => 'Reservation added successfully']);
             } else {

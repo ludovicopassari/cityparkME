@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parcheggi e Pagamenti</title>
+    
+    <!-- CSS Imports -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css">
+    
+    <!-- Inline Styles -->
     <style>
         #map {
             width: 100%;
@@ -49,6 +50,7 @@
     <div class="container rounded mt-2 p-5">
         <h1 class="text-center">Gestione Parcheggi</h1>
         <hr>
+
         <div class="row">
             <div class="col-lg-6">
                 <div id="map" class="my-4"></div>
@@ -56,6 +58,7 @@
                     Mostra Pagamenti e Prenotazioni
                 </button>
             </div>
+
             <div class="col-lg-6">
                 <h4>Parcheggio Selezionato: <span id="stallName">-</span></h4>
                 <form id="parkingForm" class="mb-3">
@@ -67,7 +70,9 @@
                         <label for="endTime" class="form-label">Orario di Fine</label>
                         <input type="time" class="form-control" id="endTime" required>
                     </div>
-                    <button type="submit" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#reservationModal">Conferma Parcheggio</button>
+                    <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reservationModal">
+                        Conferma Parcheggio
+                    </button>
                 </form>
                 <div id="confirmationMessage" class="mt-3" style="display:none;">
                     <p><strong>Orario di Parcheggio Selezionato:</strong></p>
@@ -97,7 +102,7 @@
             </div>
         </div>
 
-        <!-- Modal -->
+        <!-- Modal for Data -->
         <div class="modal fade" id="dataModal" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -110,10 +115,10 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Cost($)</th>
+                                    <th>#</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Cost($)</th>
                                 </tr>
                             </thead>
                             <tbody id="table-body"></tbody>
@@ -123,10 +128,10 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Slot ID</th>
-                                    <th scope="col">Starts at</th>
-                                    <th scope="col">Ends at</th>
+                                    <th>#</th>
+                                    <th>Slot ID</th>
+                                    <th>Starts at</th>
+                                    <th>Ends at</th>
                                 </tr>
                             </thead>
                             <tbody id="table-body-reservation"></tbody>
@@ -138,433 +143,75 @@
                 </div>
             </div>
         </div>
-    </div>
-    <!-- RESERVATION MODAL -->
-    <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reversationModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="dataModalLabel">PRENOTAZIONE</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <h6 class="mb-3">IMPORTO TOTALE :  <span id="stallImport">-</span></h6>
-                    <!-- capire come fare -->
-    
-                    <!-- Lista delle targhe -->
-                    <h6 class="mb-3">STALLO SCELTO :  <span id="stallName2">-</span> </h6>
-                    <div class="mb-3">
-                        <label for="platesList" class="form-label">Seleziona una targa</label>
-                        <select class="form-select" id="platesList" disabled>
-                            <option >Seleziona una targa</option>
-                        </select>
+
+        <!-- Modal for Reservation -->
+        <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reservationModalLabel">Prenotazione</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-    
+                    <div class="modal-body">
+                        <h6 class="mb-3">Importo Totale: <span id="stallImport">-</span></h6>
+                        <h6 class="mb-3">Stallo Scelto: <span id="stallName2">-</span></h6>
+                        <div class="mb-3">
+                            <label for="platesList" class="form-label">Seleziona una targa</label>
+                            <select class="form-select" id="platesList" disabled>
+                                <option>Seleziona una targa</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                        <button type="button" class="btn btn-primary" id="confirmReservationButton" onclick="confirmReservation()">Conferma Prenotazione</button>
+                    </div>
                 </div>
-    
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                    <button type="button" class="btn btn-primary" id="confirmReservationButton" onclick="confirmReservation()" >Conferma prenotazione</button>
+            </div>
+        </div>
+
+        <!-- Modal for Payment -->
+        <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="paymentModalLabel">Pagamento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6 class="mb-3">Paga</h6>
+                        <div class="mb-3">
+                            <label for="paymentMethod" class="form-label">Seleziona Metodo di Pagamento</label>
+                            <select class="form-select" id="paymentMethod">
+                                <option selected disabled>Seleziona un metodo</option>
+                                <option value="credit_card">credit_card</option>
+                                <option value="paypal">paypal</option>
+                                <option value="bank_transfer">bank_transfer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="creditCardList" class="form-label">Seleziona una Carta di Credito</label>
+                            <select class="form-select" id="creditCardList" disabled>
+                                <option>Seleziona una carta</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Prezzo da Pagare</label>
+                            <div class="p-3 border rounded bg-light" id="price">--</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                        <button type="button" class="btn btn-primary" id="confirmPaymentButton" onclick="confirmPayment()">Conferma Pagamento</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
 
-
-      <!-- pay Modal -->
-<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="dataModalLabel">Pagamenti e Prenotazioni</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <h6 class="mb-3">Paga</h6>
-                
-                <!-- Metodo di pagamento -->
-                <div class="mb-3">
-                    <label for="paymentMethod" class="form-label">Seleziona metodo di pagamento</label>
-                    <select class="form-select" id="paymentMethod">
-                        <option selected disabled>Seleziona un metodo</option>
-                        <option value="credit-card">credit_card</option>
-                        <option value="paypal">paypal</option>
-                        <option value="bank-transfer">bank_transfer</option>
-                    </select>
-                </div>
-
-                <!-- Lista delle carte di credito -->
-                <div class="mb-3">
-                    <label for="creditCardList" class="form-label">Seleziona una carta di credito</label>
-                    <select class="form-select" id="creditCardList" disabled>
-                        <option >Seleziona una carta</option>
-
-                    </select>
-                </div>
-
-                <!-- Prezzo -->
-                <div class="mb-3">
-                    <label for="price" class="form-label">Prezzo da pagare</label>
-                    <div class="p-3 border rounded bg-light" id="price">
-                        -- <!-- Puoi aggiornare dinamicamente il prezzo tramite JavaScript -->
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                <button type="button" class="btn btn-primary" id="confirmPaymentButton" onclick="confirmPayment()" >Conferma Pagamento</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-    <script>
-
-        // Costanti principali
-        const BASE_API_URL = 'http://localhost:8080/api';
-        const MAP_CENTER_COORDS = [41.9028, 12.4964]; // Centro mappa su Roma
-        const DEFAULT_ZOOM_LEVEL = 13;
-
-        // Inizializza la mappa
-        const map = L.map('map').setView(MAP_CENTER_COORDS, DEFAULT_ZOOM_LEVEL);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        // Utility per la gestione del token JWT
-        const TokenUtils = {
-            getToken() {
-                const token = localStorage.getItem('jwt_token');
-                if (!token) {
-                    console.error("Token non trovato.");
-                    window.location.href = '/login.html';
-                }
-                return token;
-            },
-
-            decode(token) {
-                const parts = token.split('.');
-                if (parts.length !== 3) throw new Error('Token JWT non valido');
-                return JSON.parse(atob(parts[1]));
-            },
-
-            isValid(decodedToken) {
-                const currentTime = Math.floor(Date.now() / 1000);
-                if (decodedToken.exp < currentTime) {
-                    localStorage.removeItem('jwt_token');
-                    window.location.href = '/login.html';
-                    return false;
-                }
-                return true;
-            }
-        };
-
-        // Funzione generica per le richieste API
-        async function fetchData(url, method = 'POST', body = null) {
-            const token = TokenUtils.getToken();
-            if (!token) return;
-
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            };
-
-            try {
-                const response = await fetch(url, { method, headers, body: JSON.stringify(body) });
-                if (!response.ok) throw new Error('Errore nella richiesta API');
-                return await response.json();
-            } catch (error) {
-                console.error('Errore:', error);
-            }
-        }
-
-        // Funzioni per la gestione delle mappe
-        async function fetchSlots() {
-            try {
-                const response = await fetch(`${BASE_API_URL}/get_slots.php`);
-                const slots = await response.json();
-                slots.forEach(slot => {
-                    if (slot.latitude && slot.longitude) {
-                        const marker = L.marker([slot.latitude, slot.longitude]).addTo(map);
-                        marker.bindPopup(`
-                            <strong>${slot.location}</strong><br>
-                            Tariffa: €${slot.rate_per_hour}/h<br>
-                            Stato: ${slot.is_occupied ? 'Occupato' : 'Libero'}
-                        `);
-                        marker.on('click', () => {
-                            document.getElementById('stallName').textContent = slot.location;
-                            document.getElementById('stallName2').textContent = slot.location;
-                            const parkingForm = document.getElementById('parkingForm');
-                            parkingForm.addEventListener('submit',(event) =>{
-                            event.preventDefault();
-                            const startTime = document.getElementById("startTime").value;
-                            const endTime = document.getElementById('endTime').value;
-                            const start = new Date(`1970-01-01T${startTime}:00`);
-                            const end = new Date(`1970-01-01T${endTime}:00`);
-                            const hoursDiff = (end - start) / (1000 * 60 * 60);
-                            if(hoursDiff > 0){
-                                const totalCost = slot.rate_per_hour * hoursDiff;
-                                document.getElementById('stallImport').textContent=`€${totalCost.toFixed(2)}`;
-                            }else {
-                                    alert('Orario di fine deve essere successivo all\'orario di inizio.');
-                            }
-                    });
-                        });
-                    }
-                });
-            } catch (error) {
-                console.error('Errore nel caricamento degli slot:', error);
-            }
-        }
-
-        function centerMapOnUser() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    position => {
-                        const { latitude, longitude } = position.coords;
-                        map.setView([latitude, longitude], 15);
-                        L.marker([latitude, longitude]).addTo(map).bindPopup('La tua posizione').openPopup();
-                    },
-                    error => {
-                        console.error('Errore nella geolocalizzazione:', error);
-                        map.setView(MAP_CENTER_COORDS, DEFAULT_ZOOM_LEVEL);
-                    }
-                );
-            } else {
-                console.error('Geolocalizzazione non supportata dal browser.');
-                map.setView(MAP_CENTER_COORDS, DEFAULT_ZOOM_LEVEL);
-            }
-        }
-
-        // Funzioni per la gestione delle prenotazioni
-        async function loadReservationInfo(userId, reservationId) {
-            const data = await fetchData(`${BASE_API_URL}/load_reservation_info.php`, 'POST', { id_user: userId, reservation_id: reservationId });
-            if (data && data.data.length > 0) {
-                const reservation = data.data[0];
-                document.getElementById('price').innerHTML = reservation.total_cost;
-            }
-        }
-
-        async function loadReservation() {
-            const token = TokenUtils.getToken();
-            const decoded = TokenUtils.decode(token);
-            if (!TokenUtils.isValid(decoded)) return;
-
-            const data = await fetchData(`${BASE_API_URL}/load_reservation.php`, 'POST', { id_user: decoded.user_id });
-            if (!data || !data.data) return;
-
-            const tableBody = document.getElementById('table-body-reservation');
-            tableBody.innerHTML = '';
-
-            data.data.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <th scope="row">${item.reservation_id}</th>
-                    <td>${item.slot_id}</td>
-                    <td>${item.start_time || "N/A"}</td>
-                    <td>${item.end_time || "N/A"}</td>
-                `;
-
-                if (item.payment_status === "pending" && item.status === "completed") {
-                    const payButton = document.createElement('button');
-                    payButton.id = item.reservation_id;
-                    payButton.classList.add('btn', 'btn-primary');
-                    payButton.textContent = "Paga";
-                    payButton.setAttribute('data-bs-toggle', 'modal');
-                    payButton.setAttribute('data-bs-target', '#paymentModal');
-                    payButton.addEventListener('click', () => loadReservationInfo(decoded.user_id, item.reservation_id));
-
-                    const buttonCell = document.createElement('td');
-                    buttonCell.appendChild(payButton);
-                    row.appendChild(buttonCell);
-                } else {
-                    row.innerHTML += '<td></td>';
-                }
-
-                tableBody.appendChild(row);
-            });
-        }
-
-        // Funzioni per la gestione dei pagamenti
-        async function loadPayments() {
-            const token = TokenUtils.getToken();
-            const decoded = TokenUtils.decode(token);
-            if (!TokenUtils.isValid(decoded)) return;
-
-            const data = await fetchData(`${BASE_API_URL}/load_payments.php`, 'POST', { id_user: decoded.user_id });
-            if (!data || !data.data) return;
-
-            const tableBody = document.getElementById("table-body");
-            tableBody.innerHTML = '';
-
-            data.data.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.reservation_id}</td>
-                    <td>${item.payment_date || "N/A"}</td>
-                    <td>${item.payment_status}</td>
-                    <td>${item.total_cost}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
-        async function loadCreditCards() {
-            const token = TokenUtils.getToken();
-            const decoded = TokenUtils.decode(token);
-            if (!TokenUtils.isValid(decoded)) return;
-
-            const data = await fetchData(`${BASE_API_URL}/get_user_card_number.php`, 'POST', { id_user: decoded.user_id });
-            if (!data || !data.data) return;
-
-            const creditCardList = document.getElementById('creditCardList');
-            creditCardList.innerHTML = '<option value="default" disabled selected>Seleziona una carta</option>';
-
-            data.data.forEach(card => {
-                const option = document.createElement('option');
-                option.value = card.card_number;
-                option.textContent = `${card.card_type} ****${card.card_number.slice(-4)}`;
-                creditCardList.appendChild(option);
-            });
-
-            creditCardList.disabled = false;
-        }
-
-        async function loadPlates(){
-            const token=TokenUtils.getToken();
-            const decoded = TokenUtils.decode(token);
-            if(!TokenUtils.isValid(decoded)) return;
-            const data = await fetchData(`${BASE_API_URL}/get_user_plates.php`, 'POST', { id_user: decoded.user_id });
-            const platesList = document.getElementById('platesList');
-            platesList.innerHTML = '<option value="default" disabled selected>Seleziona una targa</option>';
-            data.data.forEach(plate => {
-                const option = document.createElement('option');
-                option.value = plate.targa;
-                option.textContent = `${plate.targa.slice(0, 3)}***${plate.targa.slice(-3)}`;
-                platesList.appendChild(option);
-            });
-
-            platesList.disabled = false;
-        }
-
-        // Funzione per caricare la navbar
-        async function loadNavbar() {
-            try {
-                const response = await fetch('navbar.html');
-                const data = await response.text();
-                document.getElementById('navbar').innerHTML = data;
-            } catch (error) {
-                console.error('Errore nel caricamento della navbar:', error);
-            }
-        }
-
-        async function confirmPayment() {
-            const paymentMethod = document.getElementById('paymentMethod').value;
-            const token = TokenUtils.getToken();
-            const decoded = TokenUtils.decode(token);
-            if (!TokenUtils.isValid(decoded)) return;
-
-            const reservationId = document.querySelector('#paymentModal').getAttribute('data-reservation-id');
-            if (!reservationId || !paymentMethod ) {
-                console.error("Dati di pagamento non validi.");
-                return;
-            }
-
-            const response = await fetchData(`${BASE_API_URL}/confirm_payment.php`, 'POST', {
-                id_user: decoded.user_id,
-                reservation_id: reservationId,
-                payment_method: paymentMethod,
-                amount : document.getElementById('price').textContent 
-            });
-
-            if (response && response.success) {
-                alert('Pagamento effettuato con successo!');
-                loadReservation(); // Aggiorna la lista delle prenotazioni
-                loadPayments(); // Aggiorna la lista dei pagamenti
-                document.getElementById('paymentModal').modal('hide'); // Chiudi il modal
-            } else {
-                alert('Errore nel pagamento. Riprova.');
-            }
-        }
-
-    async function confirmReservation() {
-        let total_cost = document.getElementById('stallImport').innerText;
-        total_cost = total_cost.replace('€', '').trim();
-        total_cost=parseFloat(total_cost);
-        const slot_location = document.getElementById('stallName2').innerText;
-        let start_time = document.getElementById('startTime').value;
-        let end_time = document.getElementById('endTime').value;
-        const targa = document.getElementById('platesList').value;
-        let currentDate = new Date().toISOString().split('T')[0]; // Prende la data corrente in formato "YYYY-MM-DD"
-
-        start_time = `${currentDate} ${start_time}:00`; // Aggiungi ore, minuti e secondi
-        end_time = `${currentDate} ${end_time}:00`; 
-        // Validazione base dei campi
-        if (!total_cost || !slot_location || !start_time || !end_time || !targa) {
-            alert('Per favore, compila tutti i campi richiesti.');
-            return;
-        }
-
-        const token = TokenUtils.getToken();
-        const decoded = TokenUtils.decode(token);
-        if (!TokenUtils.isValid(decoded)) return;
-        console.log(JSON.stringify({
-        id_user: decoded.user_id,
-        total_cost: total_cost,
-        slot_location: slot_location,
-        start_time: start_time,
-        end_time: end_time,
-        targa: targa
-        }));
-
-        try {
-            const response = await fetchData(`${BASE_API_URL}/add_reservation.php`, 'POST', {
-                id_user: decoded.user_id,
-                total_cost: total_cost,
-                slot_location: slot_location,
-                start_time: start_time,
-                end_time: end_time,
-                targa: targa
-            });
-
-            if (response && response.success) {
-                //document.getElementById('paymentModal').modal('hide'); // Chiudi il modal
-                alert('Prenotazione effettuata con successo.');
-            } else {
-                alert('Errore nella prenotazione. Riprova.');
-            }
-        } catch (error) {
-            alert('Si è verificato un errore nella richiesta. Riprova più tardi.');
-        }
-}
-
-
-
-        // Event listeners per i modali
-        document.getElementById('dataModal').addEventListener('shown.bs.modal', () => {
-            loadPayments();
-            loadReservation();
-        });
-        document.getElementById("reservationModal").addEventListener('shown.bs.modal',() =>{
-            loadPlates();
-        })
-
-        document.getElementById("paymentModal").addEventListener('shown.bs.modal', (event) => {
-        const button = event.relatedTarget; // Bottone che ha aperto il modal
-        const reservationId = button.getAttribute('id'); // L'ID della prenotazione è nell'attributo ID del bottone
-        const modal = document.querySelector('#paymentModal');
-        modal.setAttribute('data-reservation-id', reservationId); // Imposta l'attributo data-reservation-id
-        loadCreditCards(); // Carica le carte di credito
-    });
-
-        // Inizializzazione
-        loadNavbar();
-        centerMapOnUser();
-        fetchSlots();
-
-    </script>
+    <!-- JS Imports -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/dashboard.js"></script>
 </body>
 </html>
