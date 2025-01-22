@@ -50,6 +50,19 @@
 
      <!-- Script di validazione del modulo -->
     <script>
+         async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+
+            // Utilizzare SHA-256 per ottenere l'hash
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+
+            // Converti il risultato in formato esadecimale
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+            return hashHex;
+        }
 
         document.getElementById('loginForm').addEventListener('submit', function(event) {
         
@@ -67,8 +80,10 @@
                     password: password
                 }
             };
+            hashPassword(password).then((hash) => {
+                requestData.data.password = hash;
 
-            const jsonRequest = JSON.stringify(requestData);
+                const jsonRequest = JSON.stringify(requestData);
             
             fetch('http://localhost:5001/authenticate', {
                         method: 'POST',
@@ -94,6 +109,8 @@
                 }).catch(error => {
                     console.error('Errore:', error);
                 });
+            });
+            
             
         });
     </script>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Slots Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inizializzazione della mappa senza centro iniziale
+        const map = L.map('map');
+
+        // Aggiunta del layer tile da OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Funzione per ottenere gli slot dal server
+        function fetchSlots() {
+            fetch('http://localhost:8080/api/get_slots.php')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore nel recupero degli slot');
+                    }
+                    return response.json();
+                })
+                .then(slots => {
+                    console.log('Dati ricevuti:', slots);
+
+                    // Aggiunta dei marker alla mappa
+                    slots.forEach(slot => {
+                        if (slot.latitude && slot.longitude) { // Controllo su coordinate valide
+                            const marker = L.marker([slot.latitude, slot.longitude]).addTo(map);
+                            marker.bindPopup(`
+                                <strong>${slot.location}</strong><br>
+                                Tariffa: €${slot.rate_per_hour}/h<br>
+                                Stato: ${slot.is_occupied ? 'Occupato' : 'Libero'}
+                            `);
+                        } else {
+                            console.warn('Slot con coordinate mancanti:', slot);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Impossibile caricare i dati degli stalli di parcheggio.');
+                });
+        }
+
+
+        // Funzione per centrare la mappa sulla posizione dell'utente
+        function centerMapOnUser() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const userLat = position.coords.latitude;
+                        const userLon = position.coords.longitude;
+
+                        // Centrare la mappa sulla posizione dell'utente
+                        map.setView([userLat, userLon], 13);
+
+                        // Aggiungere un marker per indicare la posizione dell'utente
+                        L.marker([userLat, userLon]).addTo(map).bindPopup('La tua posizione').openPopup();
+                    },
+                    error => {
+                        console.error('Errore nella geolocalizzazione:', error);
+                        map.setView([40.0, -74.0], 13); // Centro di default
+                    }
+                );
+            } else {
+                console.error('Geolocalizzazione non supportata dal browser.');
+                map.setView([40.0, -74.0], 13); // Centro di default
+            }
+        }
+
+        // Chiamata per recuperare gli slot
+        fetchSlots();
+
+        // Centrare la mappa sulla posizione dell'utente
+        centerMapOnUser();
+    </script>
+</body>
+</html>

@@ -74,7 +74,7 @@ def check_first_factor(prop_email, prop_passwd):
 
         cursor = connection.cursor(dictionary=True)
 
-        user_query = "SELECT id,email,password_hash,is_2fa_enabled FROM users WHERE email = %s "
+        user_query = "SELECT id, email, password_hash, two_factor_enabled FROM users WHERE email = %s "
 
         cursor.execute(user_query, (prop_email,))
         
@@ -84,7 +84,7 @@ def check_first_factor(prop_email, prop_passwd):
             user_id = user_data.get('id')
             email = user_data.get('email')
             passwd_hash = user_data.get('password_hash')
-            two_factor_required = user_data.get('is_2fa_enabled')
+            two_factor_required = user_data.get('two_factor_enabled')
 
             if email == prop_email and passwd_hash == prop_passwd and  two_factor_required == 0:
                 # Creazione del payload
@@ -111,7 +111,7 @@ def check_first_factor(prop_email, prop_passwd):
                 transaction_id = str(generate_transaction_id())
 
                 # prepara la query per inserire OTP nel DB
-                sql_insert_query = "INSERT INTO otp_requests (transaction_id,user_id, otp_code, expiration_time, is_used, created_at) VALUES (%s,%s, %s, %s, %s, NOW());"
+                sql_insert_query = "INSERT INTO otp_transactions (transaction_id,user_id, otp_code, expiration_time, is_used, created_at) VALUES (%s,%s, %s, %s, %s, NOW());"
                 
                 current_time = datetime.datetime.now()
 
@@ -164,7 +164,7 @@ def check_second_factor(otp_prop,id_transaction):
 
         cursor = connection.cursor(dictionary=True)
 
-        user_query =  "SELECT user_id, otp_code, expiration_time FROM otp_requests WHERE transaction_id = %s"
+        user_query =  "SELECT user_id, otp_code, expiration_time, is_used FROM otp_transactions WHERE transaction_id = %s"
 
         cursor.execute(user_query, (id_transaction,))
         
@@ -176,20 +176,25 @@ def check_second_factor(otp_prop,id_transaction):
             expire_time = datetime.datetime.strptime(str(transaction_data.get('expiration_time')), "%Y-%m-%d %H:%M:%S")
             now = datetime.datetime.now()
             user_id = transaction_data.get('user_id')
+            is_used = transaction_data.get('is_used')
 
-            if now > expire_time:
+            if now > expire_time or is_used:
                 expire_otp_err = {
                     "status": "error",
                     "message": "Invalid or expired OTP",
                 }
                 return expire_otp_err
             else:
-                if otp_prop == otp:
+                if otp_prop == otp and not is_used:
                       # Creazione del payload
                     payload = {
                         "user_id": user_id,
-                        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=0.0333)  
+                        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  #0.0333
                     }
+                    
+                    update_query = "UPDATE otp_transactions SET is_used = %s WHERE transaction_id = %s"
+                    cursor.execute(update_query, (1,id_transaction,))
+                    connection.commit()
 
                     # Generazione del token
                     token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
@@ -229,9 +234,9 @@ def register_user(first_name,last_name,username,email,passwd):
 
         cursor = connection.cursor(dictionary=True)
 
-        user_query =  "INSERT INTO users (email,password_hash, is_2fa_enabled, created_at, updated_at) VALUES (%s,%s,%s,NOW(),NOW())"
+        user_query =  "INSERT INTO users (first_name, last_name, username, email, password_hash, two_factor_enabled, created_at, updated_at) VALUES (%s,%s,%s,%s,%s,%s,NOW(),NOW())"
 
-        cursor.execute(user_query, (email,passwd,1))
+        cursor.execute(user_query, (first_name, last_name ,username, email, passwd,1))
         
         connection.commit()
 

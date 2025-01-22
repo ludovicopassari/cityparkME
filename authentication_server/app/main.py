@@ -36,7 +36,7 @@ def authenticate():
         return auth_result
     elif action =='verify_otp':
         otp_prop = data.get('otp')
-        transaction_id_prop =data.get('transaction_id') 
+        transaction_id_prop = data.get('transaction_id') 
         otp_verification_result = check_second_factor(otp_prop,transaction_id_prop)
         return jsonify(otp_verification_result)
     return jsonify(response_error)
