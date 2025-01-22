@@ -408,6 +408,7 @@ async function confirmReservation() {
 
         if (response && response.success) {
             //document.getElementById('paymentModal').modal('hide'); // Chiudi il modal
+            fetchSlots(); // Aggiorna gli slot sulla mappa
             alert("Prenotazione effettuata con successo.");
         } else {
             alert("Errore nella prenotazione. Riprova.");
