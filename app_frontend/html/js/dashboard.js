@@ -62,9 +62,20 @@ async function fetchData(url, method = "POST", body = null) {
     }
 }
 
+// Array per memorizzare i marker attualmente visualizzati
+let markers = [];
+
 // Funzione per recuperare gli slot di parcheggio
 async function fetchSlots() {
     try {
+        // Rimuovi tutti i marker esistenti dalla mappa
+        markers.forEach((marker) => {
+            map.removeLayer(marker);
+        });
+        // Svuota l'array dei marker
+        markers = [];
+
+        // Richiedi i dati degli slot
         const response = await fetch(`${BASE_API_URL}/get_slots.php`);
         const slots = await response.json();
 
@@ -97,6 +108,9 @@ async function fetchSlots() {
                     [slot.latitude, slot.longitude],
                     markerOptions
                 ).addTo(map);
+
+                // Aggiungi il marker all'array dei marker
+                markers.push(marker);
 
                 // Crea un popup con le informazioni dello slot
                 marker.bindPopup(`
@@ -151,6 +165,7 @@ async function fetchSlots() {
     }
 }
 
+
 function centerMapOnUser() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -202,7 +217,7 @@ async function loadReservation() {
 
     const tableBody = document.getElementById("table-body-reservation");
     tableBody.innerHTML = "";
-
+    console.log(data.data);
     data.data.forEach((item) => {
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -351,7 +366,10 @@ async function confirmPayment() {
     );
 
     if (response && response.success) {
+    
         alert("Pagamento effettuato con successo!");
+        load_box();
+        loadPayments();
         loadReservation(); // Aggiorna la lista delle prenotazioni
         loadPayments(); // Aggiorna la lista dei pagamenti
         document.getElementById("paymentModal").modal("hide"); // Chiudi il modal
@@ -410,12 +428,36 @@ async function confirmReservation() {
             //document.getElementById('paymentModal').modal('hide'); // Chiudi il modal
             fetchSlots(); // Aggiorna gli slot sulla mappa
             alert("Prenotazione effettuata con successo.");
+            load_box();
         } else {
             alert("Errore nella prenotazione. Riprova.");
         }
     } catch (error) {
         alert("Si è verificato un errore nella richiesta. Riprova più tardi.");
     }
+}
+
+async function load_box(){
+    const token = TokenUtils.getToken();
+    const decoded = TokenUtils.decode(token);
+    if (!TokenUtils.isValid(decoded)) return;
+
+
+    const response = await fetchData(
+        `${BASE_API_URL}/load_box.php`,
+        "POST",
+        {
+            id_user: decoded.user_id,
+        }
+    );
+    if (response && response.success) {
+        document.getElementById("activeCount").innerHTML=response.count_a;
+        document.getElementById("suspendedCount").innerHTML=response.count_s;
+        document.getElementById("completedCount").innerHTML=response.count_c;
+    } else {
+        alert("Errore nel pagamento. Riprova.");
+    }
+
 }
 
 // Event listeners per i modali
@@ -440,11 +482,13 @@ document
         loadCreditCards(); // Carica le carte di credito
     });
 
-// Inizializzazione
-loadNavbar();
-centerMapOnUser();
-fetchSlots();
 
+document.addEventListener('DOMContentLoaded',function(){
+    loadNavbar();
+    centerMapOnUser();
+    fetchSlots();
+    load_box();
+});
 /* // Costanti principali
 const BASE_API_URL = 'http://localhost:8080/api'; // URL di base per le API
 const MAP_CENTER_COORDS = [41.9028, 12.4964]; // Coordinate per centrare la mappa su Roma

@@ -16,16 +16,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit();
 }
 
-// Configurazione del database
-$host = 'mysql';
-$db = 'my_database';
-$user = 'root';
-$password = 'rootpassword';
-$port = 3306;
+// Includi il file di configurazione
+$config = include './config.php';
+
+// Usa i parametri di configurazione
+$host = $config['host'];
+$dbname = $config['dbname'];
+$username = $config['username'];
+$password = $config['password'];
+$charset = 'utf8mb4';
+$secret_key = $config['secret_key'];  // Cambia con la tua chiave segreta
 
 try {
     // Connessione al database
-    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$db;charset=utf8", $user, $password);
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Query per ottenere tutti gli slot

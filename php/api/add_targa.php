@@ -22,16 +22,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 require_once __DIR__ . '/../vendor/autoload.php'; // Assumendo che il file si trovi nella cartella superiore
 use \Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-// La chiave segreta che usi per firmare e verificare i JWT (deve essere la stessa usata per emettere i token)
-$secret_key = 'la_tua_chiave_segreta'; // Cambia con la tua chiave segreta
 
+// Includi il file di configurazione
+$config = include './config.php';
 
-// Impostazioni per la connessione al database
-$host = 'mysql';
-$dbname = 'my_database';
-$username = 'root';
-$password = 'rootpassword';
+// Usa i parametri di configurazione
+$host = $config['host'];
+$dbname = $config['dbname'];
+$username = $config['username'];
+$password = $config['password'];
 $charset = 'utf8mb4';
+$secret_key = $config['secret_key'];  // Cambia con la tua chiave segreta
 
 // Connessione al database con PDO
 $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";

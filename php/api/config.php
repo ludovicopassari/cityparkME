@@ -5,4 +5,5 @@ return [
     'dbname' => 'my_database',
     'username' => 'root',
     'password' => 'rootpassword',
+    'secret_key' => 'la_tua_chiave_segreta'
 ];

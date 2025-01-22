@@ -16,12 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 // Includi la libreria per il JWT
-// Usa il percorso corretto per il tuo autoload.php
 require_once __DIR__ . '/../vendor/autoload.php'; // Assumendo che il file si trovi nella cartella superiore
 
 use \Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+
 // La chiave segreta che usi per firmare e verificare i JWT (deve essere la stessa usata per emettere i token)
+
 
 // Includi il file di configurazione
 $config = include './config.php';
@@ -33,6 +34,7 @@ $username = $config['username'];
 $password = $config['password'];
 $charset = 'utf8mb4';
 $secret_key = $config['secret_key'];  // Cambia con la tua chiave segreta
+
 
 // Connessione al database con PDO
 $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
@@ -77,21 +79,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Controlla se il campo id_user esiste nel JSON
             if (isset($data['id_user'])) {
                 $id_user = $data['id_user'];
+                $confirmed="confirmed";
+                $cancelled="cancelled";
+                $completed="completed";
+                $pending = "pending";
+                $paid = "paid";
 
-                // Prepara la query per recuperare i dati in base a id_user
-                $sql = "SELECT * FROM users WHERE id= :id_user";
-                $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+                // Prepara la query per recuperare i pagamenti in base a id_user
+                $sql_count_active="SELECT COUNT(reservation_id) AS COUNT_A FROM reservations WHERE status=:confirmed AND payment_status=:pending AND user_id=:id_user";
+                //payment status : pending   status : completed
+                $sql_count_completed="SELECT COUNT(reservation_id) AS COUNT_S FROM reservations WHERE status=:completed AND payment_status=:pending AND user_id=:id_user";
+                //payment status : paid status : completed
+                $sql_count_close="SELECT COUNT(reservation_id) AS COUNT_C FROM reservations WHERE status=:completed  AND payment_status=:paid AND user_id=:id_user";
 
-                // Esegui la query
-                $stmt->execute();
-                $result = $stmt->fetch();
+                $stmt_count_a= $pdo->prepare($sql_count_active);
+                $stmt_count_a->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+                $stmt_count_a->bindParam(':confirmed',$confirmed ,PDO::PARAM_STR);
+                $stmt_count_a->bindParam(':pending',$pending ,PDO::PARAM_STR);
+                $stmt_count_a->execute();
+                $result_a= $stmt_count_a->fetchColumn();
+
+                $stmt_count_s= $pdo->prepare($sql_count_completed);
+                $stmt_count_s->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+                $stmt_count_s->bindParam(':completed',$completed ,PDO::PARAM_STR);
+                $stmt_count_s->bindParam(':pending',$pending ,PDO::PARAM_STR);
+                $stmt_count_s->execute();
+                $result_s= $stmt_count_s->fetchColumn();
+
+                $stmt_count_c= $pdo->prepare($sql_count_close);
+                $stmt_count_c->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+                $stmt_count_c->bindParam(':completed',$completed ,PDO::PARAM_STR);
+                $stmt_count_c->bindParam(':paid',$paid ,PDO::PARAM_STR);
+                
+                $stmt_count_c->execute();
+                $result_c= $stmt_count_c->fetchColumn();
 
                 // Controlla se sono stati trovati risultati
-                if ($result) {
-                    echo json_encode(['success' => true, 'data' => $result]);
+                if (true) {
+                    echo json_encode(['success' => true, 'count_a' => $result_a, 'count_s' => $result_s, 'count_c' => $result_c]);
                 } else {
-                    echo json_encode(['success' => false, 'message' => 'Utente non trovato']);
+                    echo json_encode(['success' => false, 'message' => 'Nessun pagamento trovato']);
                 }
             } else {
                 // Se id_user non è presente nel body JSON
