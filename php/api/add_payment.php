@@ -23,9 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-// Includi la libreria per il JWT
-// Usa il percorso corretto per il tuo autoload.php
-require_once __DIR__ . '/../vendor/autoload.php'; // Assumendo che il file si trovi nella cartella superiore
+
+require_once __DIR__ . '/../vendor/autoload.php'; // Carica le dipendenze di Composer
 use \Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 

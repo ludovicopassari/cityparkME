@@ -32,7 +32,7 @@ $dbname = $config['dbname'];
 $username = $config['username'];
 $password = $config['password'];
 $charset = 'utf8mb4';
-$secret_key = $config['secret_key'];  // Cambia con la tua chiave segreta
+$secret_key = $config['secret_key'];  
 
 // Connessione al database con PDO
 $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";

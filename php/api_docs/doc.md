@@ -248,7 +248,6 @@ La richiesta non utilizza il metodo POST.
 ---
 
 
-
 &nbsp;
 
 # API Endpoint: confirm_payment.php

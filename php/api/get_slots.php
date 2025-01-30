@@ -25,7 +25,7 @@ $dbname = $config['dbname'];
 $username = $config['username'];
 $password = $config['password'];
 $charset = 'utf8mb4';
-$secret_key = $config['secret_key'];  // Cambia con la tua chiave segreta
+$secret_key = $config['secret_key']; 
 
 try {
     // Connessione al database

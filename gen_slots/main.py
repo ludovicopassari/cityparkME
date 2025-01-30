@@ -79,7 +79,7 @@ def simulate_occupancy(num_updates):
 if __name__ == "__main__":
     num_slots = 100
     area = [
-        (38.08755104967813 + 0.001 * i, 15.496349524696567 + 0.001 * j)
+        (38.19948430583643 + 0.001 * i,  15.555938065608816 + 0.001 * j)
         for i in range(-5, 5)  # Latitudine variabile su una piccola area
         for j in range(-5, 5)  # Longitudine variabile su una piccola area
     ]

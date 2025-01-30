@@ -21,7 +21,7 @@ require_once __DIR__ . '/../vendor/autoload.php'; // Assumendo che il file si tr
 
 use \Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-// La chiave segreta che usi per firmare e verificare i JWT (deve essere la stessa usata per emettere i token)
+
 
 
 // Includi il file di configurazione

@@ -5,6 +5,7 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,    -- Nome utente, deve essere unico
     email VARCHAR(50) UNIQUE NOT NULL,    -- email, deve essere unico
     password_hash VARCHAR(255) NOT NULL,     -- Hash della password per motivi di sicurezza
+    salt VARCHAR(50) NOT NULL,                -- Salt per la generazione dell'hash della password
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Data di creazione del record
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Data di aggiornamento
     two_factor_enabled BOOLEAN DEFAULT FALSE -- Richiede autenticazione a due fattori

@@ -16,13 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit();
 }
 
-// Includi la libreria per il JWT
-// Usa il percorso corretto per il tuo autoload.php
+
+
 require_once __DIR__ . '/../vendor/autoload.php'; // Assumendo che il file si trovi nella cartella superiore
 
 use \Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-// La chiave segreta che usi per firmare e verificare i JWT (deve essere la stessa usata per emettere i token)
+
 // Includi il file di configurazione
 $config = include './config.php';
 
@@ -32,7 +32,7 @@ $dbname = $config['dbname'];
 $username = $config['username'];
 $password = $config['password'];
 $charset = 'utf8mb4';
-$secret_key = $config['secret_key'];  // Cambia con la tua chiave segreta
+$secret_key = $config['secret_key'];  
 
 // Connessione al database con PDO
 $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
@@ -68,35 +68,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
         try{
-              // Decodifica il token JWT
-              $decoded = JWT::decode($bearer_token, new Key($secret_key, 'HS256'));
-            // Leggi il corpo della richiesta JSON
-    $input = file_get_contents('php://input');
-    $data = json_decode($input, true);
+                // Decodifica il token JWT
+                $decoded = JWT::decode($bearer_token, new Key($secret_key, 'HS256'));
+                // Leggi il corpo della richiesta JSON
+                $input = file_get_contents('php://input');
+                $data = json_decode($input, true);
 
-    // Controlla se il campo id_user esiste nel JSON
-    if (isset($data['id_user'])) {
-        $id_user = $data['id_user'];
+                // Controlla se il campo id_user esiste nel JSON
+                if (isset($data['id_user'])) {
+                    $id_user = $data['id_user'];
 
-        // Prepara la query per recuperare i dati in base a id_user
-        $sql = "SELECT * FROM credit_cards WHERE user_id = :id_user";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+                    // Prepara la query per recuperare i dati in base a id_user
+                    $sql = "SELECT * FROM credit_cards WHERE user_id = :id_user";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
 
-        // Esegui la query
-        $stmt->execute();
-        $result = $stmt->fetchall();
+                    // Esegui la query
+                    $stmt->execute();
+                    $result = $stmt->fetchall();
 
-        // Controlla se sono stati trovati risultati
-        if ($result) {
-            echo json_encode(['success' => true, 'data' => $result]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Utente non trovato']);
-        }
-    } else {
-        // Se id_user non è presente nel body JSON
-        echo json_encode(['success' => false, 'message' => 'Campo id_user mancante']);
-    }
+                    // Controlla se sono stati trovati risultati
+                    if ($result) {
+                        echo json_encode(['success' => true, 'data' => $result]);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'Utente non trovato']);
+                    }
+                } else {
+                    // Se id_user non è presente nel body JSON
+                    echo json_encode(['success' => false, 'message' => 'Campo id_user mancante']);
+                }
         }catch (Exception $e) {
             // Token non valido o scaduto
             http_response_code(401); // Non autorizzato
